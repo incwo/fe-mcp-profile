@@ -6,6 +6,8 @@
 
 > Exploratory version 0.1. This project is neither an AFNOR standard, nor an approved platform, nor a tax compliance certification. It connects to no real service.
 
+**Vendors:** give the [complete implementation prompt](PROMPT.en.md) to your coding AI to add the profile to your MCP server. [FR](PROMPT.md) and [ES](PROMPT.es.md) versions are available.
+
 ## Why
 
 Invoice formats and exchanges with approved platforms already have standards. Daily work remains split across systems: a platform knows about a refusal, an ERP knows the purchase order, and an accounting firm knows the booking. FE-MCP proposes six common business calls with sourced facts and explicit actions. An authorized MCP client can connect to each software server separately and combine their responses. Servers do not communicate automatically with one another.
@@ -50,7 +52,7 @@ A real adapter must provide its own test case, replace the ID after `--case-id`,
 
 ## Place in the ecosystem
 
-FE-MCP sits **above** business APIs and XP Z12-013. Approved platforms retain their legal transmission and reception role; platform, commercial and accounting statuses remain distinct. This repository does not replace the existing [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr) server, which exposes approved platform interfaces. The intended next step is an “exception case” pilot with two vendors and an accounting firm; incwo integration follows profile validation.
+FE-MCP sits **above** business APIs and XP Z12-013. Approved platforms retain their legal transmission and reception role; platform, commercial and accounting statuses remain distinct. This repository does not replace the existing [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr) server, which exposes approved platform interfaces. The planned first pilot uses the incwo MCP server and synthetic data; a trial across two vendors and an accounting firm may follow.
 
 Sources: [French tax authority — approved platforms](https://www.impots.gouv.fr/facturation-electronique-et-plateformes-agreees), [external specifications](https://www.impots.gouv.fr/specifications-externes-b2b), [MCP architecture](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture).
 

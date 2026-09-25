@@ -6,6 +6,8 @@
 
 > Versión exploratoria 0.1. Este proyecto no es una norma AFNOR, una plataforma autorizada ni una certificación de cumplimiento fiscal. No se conecta a ningún servicio real.
 
+**Proveedores:** entregue el [prompt completo de implementación](PROMPT.es.md) a su IA de programación para añadir el perfil a su servidor MCP. Versiones [FR](PROMPT.md) y [EN](PROMPT.en.md).
+
 ## Por qué
 
 Los formatos de factura y los intercambios con plataformas autorizadas ya cuentan con normas. El trabajo diario sigue repartido: una plataforma conoce un rechazo, el ERP conoce el pedido y la asesoría conoce el asiento. FE-MCP propone seis llamadas empresariales comunes con hechos documentados y acciones explícitas. Un cliente MCP autorizado puede conectarse por separado a los servidores de cada software y combinar sus respuestas. Los servidores no se comunican automáticamente entre sí.
@@ -50,7 +52,7 @@ Un adaptador real debe aportar su propio expediente de prueba, sustituir el iden
 
 ## Lugar en el ecosistema
 
-FE-MCP se sitúa **por encima** de las API empresariales y de XP Z12-013. Las plataformas autorizadas conservan su papel legal de transmisión y recepción; los estados de la plataforma, comerciales y contables siguen siendo distintos. Este repositorio no sustituye al servidor existente [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr), que expone interfaces de plataformas. El siguiente paso previsto es un piloto de «expediente de excepción» con dos proveedores y una asesoría; la integración con incwo vendrá después de validar el perfil.
+FE-MCP se sitúa **por encima** de las API empresariales y de XP Z12-013. Las plataformas autorizadas conservan su papel legal de transmisión y recepción; los estados de la plataforma, comerciales y contables siguen siendo distintos. Este repositorio no sustituye al servidor existente [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr), que expone interfaces de plataformas. El primer piloto previsto usa el servidor MCP de incwo y datos sintéticos; después podrá seguir una prueba entre dos proveedores y una asesoría.
 
 Fuentes: [autoridad fiscal francesa — plataformas](https://www.impots.gouv.fr/facturation-electronique-et-plateformes-agreees), [especificaciones externas](https://www.impots.gouv.fr/specifications-externes-b2b), [arquitectura MCP](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture).
 

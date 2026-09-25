@@ -6,6 +6,8 @@ Français · [English](README.en.md) · [Español](README.es.md)
 
 > Version exploratoire 0.1. Ce projet n'est ni une norme AFNOR, ni une plateforme agréée, ni une certification de conformité fiscale. Aucun service réel n'est connecté.
 
+**Éditeurs :** transmettez le [prompt d’implémentation complet](PROMPT.md) à votre IA codante pour ajouter le profil à votre MCP. Versions [EN](PROMPT.en.md) et [ES](PROMPT.es.md).
+
 ## Pourquoi
 
 Les formats de facture et les échanges avec les plateformes agréées disposent déjà de standards. Le travail quotidien reste dispersé : une PA connaît un refus, l'ERP connaît la commande et le cabinet connaît la comptabilisation. FE-MCP propose six appels métier communs, avec des faits sourcés et des actions explicites. Un client MCP autorisé peut connecter séparément les serveurs de ces logiciels et rapprocher leurs réponses. Il n'y a pas de communication automatique de serveur à serveur.
@@ -50,7 +52,7 @@ Un adaptateur réel doit fournir son propre dossier de test, remplacer l'identif
 
 ## Position dans l'écosystème
 
-FE-MCP se place **au-dessus** des API métier et de la norme XP Z12-013. Les plateformes agréées conservent leur rôle légal de transmission et de réception ; les statuts PA, commerciaux et comptables restent distincts. Ce dépôt ne remplace pas le serveur existant [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr), qui expose notamment des interfaces de PA. L'étape suivante visée est un pilote « dossier d'exception » avec deux éditeurs et un cabinet ; l'intégration incwo viendra après validation du profil.
+FE-MCP se place **au-dessus** des API métier et de la norme XP Z12-013. Les plateformes agréées conservent leur rôle légal de transmission et de réception ; les statuts PA, commerciaux et comptables restent distincts. Ce dépôt ne remplace pas le serveur existant [mcp-facture-electronique-fr](https://github.com/cmendezs/mcp-facture-electronique-fr), qui expose notamment des interfaces de PA. Le premier pilote prévu utilise le MCP incwo et des données synthétiques ; un essai entre deux éditeurs et un cabinet pourra suivre.
 
 Sources : [DGFiP — plateformes agréées](https://www.impots.gouv.fr/facturation-electronique-et-plateformes-agreees), [DGFiP — spécifications externes](https://www.impots.gouv.fr/specifications-externes-b2b), [architecture MCP](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture).
 
