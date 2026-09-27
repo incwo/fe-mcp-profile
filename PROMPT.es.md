@@ -6,12 +6,12 @@ Copie **todo el texto siguiente** en la IA de programación que trabaja en el re
 
 ---
 
-Trabajas en el repositorio MCP de un proveedor de software. **Implementa el perfil comunitario FE-MCP 0.1.0** en este servidor usando los datos reales y los mecanismos de autorización del software; después demuestra la conformidad con un expediente de prueba sintético. Haz los cambios en el repositorio, ejecuta las pruebas y entrega un informe verificable. No actives la transmisión de facturas ni escrituras reglamentarias para cumplir este prompt.
+Trabajas en el repositorio MCP de un proveedor de software. **Implementa el perfil comunitario FE-MCP 0.2.0** en este servidor usando los datos reales y los mecanismos de autorización del software; después demuestra la conformidad con un expediente de prueba sintético. Haz los cambios en el repositorio, ejecuta las pruebas y entrega un informe verificable. No actives la transmisión de facturas ni escrituras reglamentarias para cumplir este prompt.
 
 ## Lee el contrato antes de programar
 
-- Repositorio público de referencia: `https://github.com/incwo/fe-mcp-profile/tree/v0.1.1`.
-- Lee `SPEC.es.md`, `src/profile.js`, `src/reference.js`, `bin/check.js` y las pruebas del repositorio de referencia. El código de `src/profile.js` es la fuente exacta de nombres, parámetros y esquemas de la versión 0.1.0. No sustituyas silenciosamente los esquemas por otros «equivalentes».
+- Repositorio público de referencia: `https://github.com/incwo/fe-mcp-profile/tree/v0.2.0`.
+- Lee `SPEC.es.md`, `src/profile.js`, `src/reference.js`, `bin/check.js` y las pruebas del repositorio de referencia. El código de `src/profile.js` es la fuente exacta de nombres, parámetros y esquemas de la versión 0.2.0. No sustituyas silenciosamente los esquemas por otros «equivalentes».
 - El perfil es una propuesta comunitaria por encima de MCP y de las API empresariales. No sustituye las plataformas autorizadas, XP Z12-013 ni las reglas fiscales aplicables.
 - Usa el SDK MCP, el transporte, la autenticación y las convenciones existentes en tu repositorio. No añadas un segundo servidor ni otra pila tecnológica si puedes ampliar el servidor actual de forma limpia.
 
@@ -33,13 +33,15 @@ Trabajas en el repositorio MCP de un proveedor de software. **Implementa el perf
 | `fe_prepare_action`        | Prepara una acción tipada, su efecto anunciado, la revisión esperada y su caducidad; no cambia una factura emitida ni un estado reglamentario. Para la primera integración, admite solo `record_internal_note` si el software tiene realmente una nota interna. |
 | `fe_execute_action`        | Vuelve a comprobar permisos, empresa, aprobación, caducidad y revisión al ejecutar; aplica el efecto una vez y devuelve un recibo estable. Si no existe una aprobación segura o la escritura correspondiente, rechaza explícitamente la ejecución.              |
 
-En cada respuesta correcta, devuelve `structuredContent` conforme al `outputSchema` publicado, con `profile_version: "0.1.0"` y un `system` estable. Para un error empresarial o acceso denegado, devuelve un error MCP (`isError`) sin simular un éxito. Conserva los identificadores de origen y la procedencia; `case_id` es local al servidor, no un identificador fiscal universal. Proporciona `digest_sha256` solo si los bytes exactos de la prueba están disponibles para el mismo actor mediante un recurso MCP u otra vía autorizada y documentada; en caso contrario usa `null`.
+En cada respuesta correcta, devuelve `structuredContent` conforme al `outputSchema` publicado, con `profile_version: "0.2.0"` y un `system` estable. `fe_find_invoices` debe proporcionar `state_domain` (`pa`, `commercial` o `accounting`) y un cursor opaco: la misma búsqueda y el mismo límite devuelven la misma página mientras el cursor sea válido; un cursor inválido devuelve `invalid_input`. `fe_get_invoice_case` incluye `issue_date`, `due_date`, `seller_id` y `buyer_id` según el esquema. Todas las fechas y horas son UTC con `Z`. `rule_ref` sigue `namespace:rule@version`. Conserva los identificadores de origen y la procedencia; `case_id` es local al servidor. Proporciona `digest: { alg: "sha256", value: "..." }` solo si los bytes exactos de la prueba están disponibles para el mismo actor mediante una vía autorizada; en caso contrario usa `null`.
+
+Para un error empresarial o acceso denegado, devuelve `isError: true`, un mensaje humano traducido en `content` y un código estable en `_meta["fe-mcp/error"].code`. Usa los códigos de `SPEC.es.md`; no coloques los errores en `structuredContent`, reservado para respuestas correctas.
 
 ## Permisos y escrituras: salvaguardas de producción
 
 - Comprueba identidad, empresa, rol y delegación **en el servidor en cada llamada**, incluidas consultas, listas, pruebas y propuestas. El texto de un prompt, los argumentos proporcionados por un agente y las anotaciones MCP no conceden permisos. Evita también filtraciones entre empresas en errores, búsquedas y cursores.
 - Reutiliza la autenticación existente. No pases un token de cliente MCP directamente a una plataforma autorizada u otra API salvo que el flujo de autorización de esa API lo permita. No registres secretos, originales ni adjuntos sensibles.
-- El campo `approval_code` del perfil 0.1.0 **no es** una prueba de aprobación por sí solo. En producción, acepta únicamente una autorización verificable por el servidor, vinculada al actor, la empresa, el `proposal_id`, el efecto y una vida corta. Si tu arquitectura aún no lo permite, expón la herramienta pero deja la ejecución indisponible; no copies el código estático del servidor de demostración.
+- El campo `approval_code` del perfil 0.2.0 **no es** una prueba de aprobación por sí solo. En producción, acepta únicamente una autorización verificable por el servidor, vinculada al actor, la empresa, el `proposal_id`, el efecto y una vida corta. Si tu arquitectura aún no lo permite, expón la herramienta pero deja la ejecución indisponible; no copies el código estático del servidor de demostración.
 - Vincula `idempotency_key` al actor, la empresa y la operación; conserva los recibos tras reinicios y entre varias instancias. Rechaza el uso de una clave para otra propuesta. Impide duplicados con llamadas simultáneas.
 - No crees abonos, rechazos de plataforma, estados de pago ni e-reporting en esta primera integración. Cada acción futura requiere su propio análisis empresarial, esquemas y permisos.
 
@@ -53,11 +55,13 @@ En cada respuesta correcta, devuelve `structuredContent` conforme al `outputSche
 ```sh
 git clone https://github.com/incwo/fe-mcp-profile.git
 cd fe-mcp-profile
+git checkout v0.2.0
 npm ci
 node bin/check.js --case-id ID_EXPEDIENTE_SINTETICO -- comando-para-iniciar-servidor-mcp argumentos
+node bin/check.js --http https://mcp.ejemplo.es/mcp --case-id ID_EXPEDIENTE_SINTETICO --header-env FE_MCP_AUTH_HEADER
 ```
 
-El comprobador actual espera un servidor MCP **stdio**. Si el tuyo usa HTTP, crea un adaptador stdio local de prueba o ejecuta las mismas aserciones mediante un cliente MCP HTTP; indica exactamente qué se probó. El comprobador verifica la forma y un escenario de lectura, no la seguridad ni el cumplimiento fiscal. Ejecuta también las pruebas y el formateador del repositorio del proveedor.
+Elige **stdio** o **HTTP Streamable** según tu servidor. Para HTTP, define `FE_MCP_AUTH_HEADER` con la cabecera completa, por ejemplo `Authorization: Bearer <token-de-prueba>`; no muestres su valor. El comprobador verifica la forma y un escenario de lectura, no la seguridad ni el cumplimiento fiscal. Ejecuta también las pruebas y el formateador del repositorio del proveedor.
 
 ## Entrega esperada
 

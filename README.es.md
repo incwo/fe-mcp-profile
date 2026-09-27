@@ -4,7 +4,7 @@
 
 [Français](README.md) · [English](README.en.md) · Español
 
-> Versión exploratoria 0.1. Este proyecto no es una norma AFNOR, una plataforma autorizada ni una certificación de cumplimiento fiscal. No se conecta a ningún servicio real.
+> Perfil exploratorio 0.2.0. Este proyecto no es una norma AFNOR, una plataforma autorizada ni una certificación de cumplimiento fiscal. No se conecta a ningún servicio real. Las versiones del perfil y del repositorio se [registran por separado](CHANGELOG.es.md).
 
 **Proveedores:** entregue el [prompt completo de implementación](PROMPT.es.md) a su IA de programación para añadir el perfil a su servidor MCP. Versiones [FR](PROMPT.md) y [EN](PROMPT.en.md).
 
@@ -42,13 +42,14 @@ El servidor de referencia solo permite escribir una **nota interna en el ERP**. 
 
 ## Comprobar otro servidor
 
-El comprobador verifica las seis herramientas declaradas, sus esquemas, cuatro llamadas de lectura, la estabilidad de la revisión y la respuesta a un expediente desconocido. También verifica las huellas de los recursos `fe-demo://` cuando existen. Nunca llama a herramientas de escritura.
+El comprobador verifica las seis herramientas declaradas, sus esquemas, las consultas, dos páginas cuando existen, la estabilidad de la revisión y los códigos de error para expedientes y cursores desconocidos. También verifica las huellas de los recursos `fe-demo://` cuando existen. Nunca llama a herramientas de escritura. Las mismas comprobaciones funcionan por stdio y HTTP Streamable.
 
 ```sh
 node bin/check.js --case-id FR-2026-0042 -- node /ruta/al/servidor.js
+node bin/check.js --http https://mcp.ejemplo.es/mcp --case-id FR-2026-0042 --header-env FE_MCP_AUTH_HEADER
 ```
 
-Un adaptador real debe aportar su propio expediente de prueba, sustituir el identificador después de `--case-id`, autenticar a cada actor y aplicar los permisos de cada empresa. El comprobador actual es un punto de partida para la interoperabilidad, no una auditoría reglamentaria ni de seguridad.
+Para HTTP, `FE_MCP_AUTH_HEADER` debe contener la cabecera completa, por ejemplo `Authorization: Bearer <token-de-prueba>`; su valor no se muestra. Use `--header "Nombre: valor"` para cabeceras no sensibles. Las cabeceras de autorización dirigidas a URL remotas requieren HTTPS. Un adaptador real debe aportar su propio expediente de prueba, sustituir el identificador después de `--case-id`, autenticar a cada actor y aplicar los permisos de cada empresa. El comprobador actual es un punto de partida para la interoperabilidad, no una auditoría reglamentaria ni de seguridad.
 
 ## Lugar en el ecosistema
 

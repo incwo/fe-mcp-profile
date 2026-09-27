@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 
-export const PROFILE_VERSION = "0.1.0";
+export const PROFILE_VERSION = "0.2.0";
 export const CASE_ID = "FR-2026-0042";
 export const TOOL_NAMES = [
   "fe_find_invoices",
@@ -13,6 +13,8 @@ export const TOOL_NAMES = [
 
 const text = z.string().min(1);
 const caseId = text.describe("Stable case identifier from fe_find_invoices");
+const utcDateTime = z.iso.datetime({ offset: false });
+const ruleRef = z.string().regex(/^[^:@\s]+:[^@\s]+@[^@\s]+$/);
 
 export const TOOL_SCHEMAS = {
   fe_find_invoices: {
@@ -25,7 +27,12 @@ export const TOOL_SCHEMAS = {
       profile_version: text,
       system: text,
       cases: z.array(
-        z.object({ case_id: text, invoice_number: text, current_state: text }),
+        z.object({
+          case_id: text,
+          invoice_number: text,
+          state_domain: z.enum(["pa", "commercial", "accounting"]),
+          current_state: text,
+        }),
       ),
       next_cursor: z.string().nullable(),
     },
@@ -42,23 +49,32 @@ export const TOOL_SCHEMAS = {
         buyer: text,
         amount_due: z.number(),
         currency: text,
+        issue_date: utcDateTime,
+        due_date: utcDateTime.nullable(),
+        seller_id: text.nullable(),
+        buyer_id: text.nullable(),
       }),
       facts: z.array(
         z.object({
           code: text,
           value: z.string(),
           source: text,
-          observed_at: text,
+          observed_at: utcDateTime,
         }),
       ),
       events: z.array(
-        z.object({ code: text, at: text, source: text, evidence_ref: text }),
+        z.object({
+          code: text,
+          at: utcDateTime,
+          source: text,
+          evidence_ref: text,
+        }),
       ),
       evidence: z.array(
         z.object({
           ref: text,
           kind: text,
-          digest_sha256: z.string().nullable(),
+          digest: z.object({ alg: z.enum(["sha256"]), value: text }).nullable(),
         }),
       ),
       revision: z.number().int().nonnegative(),
@@ -74,7 +90,7 @@ export const TOOL_SCHEMAS = {
         z.object({
           code: text,
           severity: z.enum(["info", "warning", "blocking"]),
-          rule_ref: text,
+          rule_ref: ruleRef,
           evidence_refs: z.array(text),
           explanation: text,
         }),
@@ -102,12 +118,18 @@ export const TOOL_SCHEMAS = {
       type: text,
       effect: text,
       expected_revision: z.number().int(),
-      expires_at: text,
+      expires_at: utcDateTime,
       approval_required: z.boolean(),
     },
   },
   fe_execute_action: {
-    input: { proposal_id: text, approval_code: text, idempotency_key: text },
+    input: {
+      proposal_id: text,
+      approval_code: text.describe(
+        "FR : champ non autoritatif ; vérifier côté serveur acteur, tenant, proposition, effet et durée. EN: non-authoritative field; verify actor, tenant, proposal, effect and lifetime server-side. ES: campo no autoritativo; verificar actor, empresa, propuesta, efecto y duración en el servidor.",
+      ),
+      idempotency_key: text,
+    },
     output: {
       profile_version: text,
       system: text,

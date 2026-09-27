@@ -12,6 +12,7 @@ import {
   ReferenceStore,
 } from "./reference.js";
 import { language } from "./i18n.js";
+import { errorResult } from "./errors.js";
 
 export function makeServer(store) {
   const server = new McpServer({
@@ -70,10 +71,7 @@ export function makeServer(store) {
             structuredContent,
           };
         } catch (error) {
-          return {
-            isError: true,
-            content: [{ type: "text", text: error.message }],
-          };
+          return errorResult(error, store.lang);
         }
       },
     );
