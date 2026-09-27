@@ -4,7 +4,7 @@
 
 Français · [English](README.en.md) · [Español](README.es.md)
 
-> Version exploratoire 0.1. Ce projet n'est ni une norme AFNOR, ni une plateforme agréée, ni une certification de conformité fiscale. Aucun service réel n'est connecté.
+> Profil exploratoire 0.2.0. Ce projet n'est ni une norme AFNOR, ni une plateforme agréée, ni une certification de conformité fiscale. Aucun service réel n'est connecté. Les versions du profil et du dépôt sont [suivies séparément](CHANGELOG.md).
 
 **Éditeurs :** transmettez le [prompt d’implémentation complet](PROMPT.md) à votre IA codante pour ajouter le profil à votre MCP. Versions [EN](PROMPT.en.md) et [ES](PROMPT.es.md).
 
@@ -42,13 +42,14 @@ Le serveur de référence n'autorise qu'une **note interne ERP** comme écriture
 
 ## Vérifier un autre serveur
 
-Le banc teste les six outils déclarés, leurs schémas, quatre appels de lecture, la stabilité de la révision et la réponse à un dossier inconnu. Il vérifie aussi les empreintes des ressources `fe-demo://` lorsqu'elles existent. Il n'appelle jamais les outils d'écriture.
+Le banc teste les six outils déclarés, leurs schémas, les lectures, deux pages quand elles existent, la stabilité de la révision et les codes d'erreur pour dossier ou curseur inconnu. Il vérifie aussi les empreintes des ressources `fe-demo://` lorsqu'elles existent. Il n'appelle jamais les outils d'écriture. Les mêmes contrôles fonctionnent en stdio et en HTTP Streamable.
 
 ```sh
 node bin/check.js --case-id FR-2026-0042 -- node /chemin/vers/serveur.js
+node bin/check.js --http https://mcp.exemple.fr/mcp --case-id FR-2026-0042 --header-env FE_MCP_AUTH_HEADER
 ```
 
-Un adaptateur réel doit fournir son propre dossier de test, remplacer l'identifiant après `--case-id`, authentifier chaque acteur et respecter les droits de chaque entreprise. Le banc actuel est un point de départ d'interopérabilité, pas un audit réglementaire ou de sécurité.
+Pour HTTP, `FE_MCP_AUTH_HEADER` doit contenir l'en-tête complet, par exemple `Authorization: Bearer <jeton-de-test>` ; sa valeur n'est pas affichée. `--header "Nom: valeur"` sert aux en-têtes non sensibles. Les en-têtes d'autorisation sur une URL distante exigent HTTPS. Un adaptateur réel doit fournir son propre dossier de test, remplacer l'identifiant après `--case-id`, authentifier chaque acteur et respecter les droits de chaque entreprise. Le banc actuel est un point de départ d'interopérabilité, pas un audit réglementaire ou de sécurité.
 
 ## Position dans l'écosystème
 

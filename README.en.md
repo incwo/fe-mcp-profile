@@ -4,7 +4,7 @@
 
 [Français](README.md) · English · [Español](README.es.md)
 
-> Exploratory version 0.1. This project is neither an AFNOR standard, nor an approved platform, nor a tax compliance certification. It connects to no real service.
+> Exploratory profile 0.2.0. This project is neither an AFNOR standard, nor an approved platform, nor a tax compliance certification. It connects to no real service. Profile and repository versions are [tracked separately](CHANGELOG.en.md).
 
 **Vendors:** give the [complete implementation prompt](PROMPT.en.md) to your coding AI to add the profile to your MCP server. [FR](PROMPT.md) and [ES](PROMPT.es.md) versions are available.
 
@@ -42,13 +42,14 @@ The reference server allows only an **internal ERP note** as a write. It is disa
 
 ## Check another server
 
-The checker verifies six declared tools, their schemas, four read calls, revision stability and the response for an unknown case. It also verifies digests for `fe-demo://` resources when present. It never calls write tools.
+The checker verifies six declared tools, their schemas, read calls, two pages when available, revision stability, and error codes for unknown cases and cursors. It also verifies digests for `fe-demo://` resources when present. It never calls write tools. The same checks work over stdio and Streamable HTTP.
 
 ```sh
 node bin/check.js --case-id FR-2026-0042 -- node /path/to/server.js
+node bin/check.js --http https://mcp.example.com/mcp --case-id FR-2026-0042 --header-env FE_MCP_AUTH_HEADER
 ```
 
-A real adapter must provide its own test case, replace the ID after `--case-id`, authenticate every actor and enforce each company's permissions. The current checker is an interoperability starting point, not a regulatory or security audit.
+For HTTP, `FE_MCP_AUTH_HEADER` must contain the full header, for example `Authorization: Bearer <test-token>`; its value is not displayed. Use `--header "Name: value"` for non-sensitive headers. Authorization headers to remote URLs require HTTPS. A real adapter must provide its own test case, replace the ID after `--case-id`, authenticate every actor and enforce each company's permissions. The current checker is an interoperability starting point, not a regulatory or security audit.
 
 ## Place in the ecosystem
 
