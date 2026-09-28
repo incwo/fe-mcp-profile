@@ -4,7 +4,7 @@
 
 [Français](README.md) · [English](README.en.md) · Español
 
-> Perfil exploratorio 0.2.0. Este proyecto no es una norma AFNOR, una plataforma autorizada ni una certificación de cumplimiento fiscal. No se conecta a ningún servicio real. Las versiones del perfil y del repositorio se [registran por separado](CHANGELOG.es.md).
+> Perfil exploratorio 0.3.0. Este proyecto no es una norma AFNOR, una plataforma autorizada ni una certificación de cumplimiento fiscal. No se conecta a ningún servicio real. Las versiones del perfil y del repositorio se [registran por separado](CHANGELOG.es.md).
 
 **Proveedores:** entregue el [prompt completo de implementación](PROMPT.es.md) a su IA de programación para añadir el perfil a su servidor MCP. Versiones [FR](PROMPT.md) y [EN](PROMPT.en.md).
 

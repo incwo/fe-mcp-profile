@@ -4,6 +4,12 @@
 
 Git tags version the repository; `profile_version` versions the FE-MCP wire contract. These numbers may differ.
 
+## v0.3.0 — profile 0.3.0 — 28 September 2026
+
+- **Incompatible with 0.2.0**: `seller_id`/`buyer_id` become `{ scheme, value } | null`. Convert strings only after reliably identifying their scheme; otherwise use `null`.
+- `z.literal` locks `profile_version` on all six outputs. Added `system_role`, `current_state_std`, `transaction_type`, event reasons, and routing observations.
+- Recommended state vocabulary, e-reporting scope, and indicative EN 16931 mapping documented in FR/EN/ES. Issues #12–#19.
+
 ## v0.2.0 — profile 0.2.0 — 27 September 2026
 
 - **Incompatible with profile 0.1.0**: `digest_sha256` becomes `digest: { alg, value } | null`, and `state_domain` is required in search results.

@@ -4,7 +4,7 @@
 
 Français · [English](README.en.md) · [Español](README.es.md)
 
-> Profil exploratoire 0.2.0. Ce projet n'est ni une norme AFNOR, ni une plateforme agréée, ni une certification de conformité fiscale. Aucun service réel n'est connecté. Les versions du profil et du dépôt sont [suivies séparément](CHANGELOG.md).
+> Profil exploratoire 0.3.0. Ce projet n'est ni une norme AFNOR, ni une plateforme agréée, ni une certification de conformité fiscale. Aucun service réel n'est connecté. Les versions du profil et du dépôt sont [suivies séparément](CHANGELOG.md).
 
 **Éditeurs :** transmettez le [prompt d’implémentation complet](PROMPT.md) à votre IA codante pour ajouter le profil à votre MCP. Versions [EN](PROMPT.en.md) et [ES](PROMPT.es.md).
 

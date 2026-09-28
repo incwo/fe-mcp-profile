@@ -6,12 +6,12 @@ Copy **all the text below** into the coding AI working on your software or MCP s
 
 ---
 
-You are working in a software vendor’s MCP repository. **Implement community profile FE-MCP 0.2.0** on this server using the software’s real data and authorization mechanisms, then demonstrate conformance with a synthetic test case. Make the changes in the repository, run the tests, and provide a verifiable report. Do not enable invoice transmission or regulatory writes to satisfy this prompt.
+You are working in a software vendor’s MCP repository. **Implement community profile FE-MCP 0.3.0** on this server using the software’s real data and authorization mechanisms, then demonstrate conformance with a synthetic test case. Make the changes in the repository, run the tests, and provide a verifiable report. Do not enable invoice transmission or regulatory writes to satisfy this prompt.
 
 ## Read the contract before coding
 
-- Public reference repository: `https://github.com/incwo/fe-mcp-profile/tree/v0.2.0`.
-- Read `SPEC.en.md`, `src/profile.js`, `src/reference.js`, `bin/check.js`, and the reference repository’s tests. The code in `src/profile.js` is the exact source for the names, parameters, and schemas in version 0.2.0. Do not silently substitute “equivalent” schemas.
+- Public reference repository: `https://github.com/incwo/fe-mcp-profile/tree/v0.3.0`.
+- Read `SPEC.en.md`, `src/profile.js`, `src/reference.js`, `bin/check.js`, and the reference repository’s tests. The code in `src/profile.js` is the exact source for the names, parameters, and schemas in version 0.3.0. Do not silently substitute “equivalent” schemas.
 - The profile is a community proposal above MCP and business APIs. It does not replace approved platforms, XP Z12-013, or applicable tax rules.
 - Use the MCP SDK, transport, authentication, and conventions already present in your repository. Do not add a second server or technology stack if the existing server can be extended cleanly.
 
@@ -33,7 +33,9 @@ You are working in a software vendor’s MCP repository. **Implement community p
 | `fe_prepare_action`        | Prepare a typed action, announced effect, expected revision, and expiry; do not modify an issued invoice or regulatory status. For the first integration, support only `record_internal_note` if the software really has an internal note. |
 | `fe_execute_action`        | Recheck rights, tenant, approval, expiry, and revision at execution time; apply the effect once and return a stable receipt. If safe approval or the corresponding write is unavailable, refuse execution explicitly.                      |
 
-For every success, return `structuredContent` that matches the published `outputSchema`, with `profile_version: "0.2.0"` and a stable `system`. `fe_find_invoices` must supply `state_domain` (`pa`, `commercial`, or `accounting`) and an opaque cursor: the same query and limit return the same page while the cursor is valid; an invalid cursor returns `invalid_input`. `fe_get_invoice_case` includes `issue_date`, `due_date`, `seller_id`, and `buyer_id` as specified. All date-times are UTC with `Z`. `rule_ref` follows `namespace:rule@version`. Preserve source IDs and provenance; `case_id` is local to the server. Supply `digest: { alg: "sha256", value: "..." }` only if the exact evidence bytes are accessible to the same actor through an authorized path; otherwise use `null`.
+For every success, return `structuredContent` that matches the published `outputSchema`, with `profile_version: "0.3.0"` and a stable `system`. `fe_find_invoices` must supply `state_domain` (`pa`, `commercial`, or `accounting`) and an opaque cursor: the same query and limit return the same page while the cursor is valid; an invalid cursor returns `invalid_input`. `fe_get_invoice_case` includes `issue_date`, `due_date`, `seller_id`, and `buyer_id` as specified. All date-times are UTC with `Z`. `rule_ref` follows `namespace:rule@version`. Preserve source IDs and provenance; `case_id` is local to the server. Supply `digest: { alg: "sha256", value: "..." }` only if the exact evidence bytes are accessible to the same actor through an authorized path; otherwise use `null`.
+
+For profile 0.3.0, treat `seller_id`/`buyer_id` as `{ scheme, value } | null` and never guess a scheme. Set `system_role` only when the server role is known; keep `system` stable. Keep `current_state` native and add `current_state_std` only when a recommended mapping in `SPEC.en.md` is justified. The case carries nullable `transaction_type` and read-only nullable `recipient_directory_status`, `recipient_pdp`, and `routing_id`; do not simulate directory resolution. Each event includes nullable `reason_code` and `reason_label`, without conflating PA rejection and buyer refusal. The profile defines no e-reporting submission. Verify `profile_version` is exactly `0.3.0` on all six outputs.
 
 For a business error or denied access, return `isError: true`, a translated human message in `content`, and a stable code in `_meta["fe-mcp/error"].code`. Use the codes defined in `SPEC.en.md`; do not put errors in `structuredContent`, which is reserved for success.
 
@@ -41,7 +43,7 @@ For a business error or denied access, return `isError: true`, a translated huma
 
 - Check identity, company/tenant, role, and delegation **server-side on every call**, including reads, listings, evidence, and proposals. Prompt text, agent-provided arguments, and MCP annotations grant no permissions. Prevent cross-tenant leaks in errors, searches, and cursors as well.
 - Reuse existing authentication. Do not pass an MCP client token directly to an approved platform or another API unless that API’s authorization flow allows it. Do not log secrets, originals, or sensitive attachments.
-- The profile 0.2.0 `approval_code` field **is not** proof of approval on its own. In production, accept only a server-verifiable authorization bound to actor, tenant, `proposal_id`, effect, and a short lifetime. If the architecture does not yet support this, expose the tool but make execution unavailable; do not copy the demo server’s static code.
+- The profile 0.3.0 `approval_code` field **is not** proof of approval on its own. In production, accept only a server-verifiable authorization bound to actor, tenant, `proposal_id`, effect, and a short lifetime. If the architecture does not yet support this, expose the tool but make execution unavailable; do not copy the demo server’s static code.
 - Bind `idempotency_key` to actor, tenant, and operation; persist receipts across restarts and multiple instances. Reject reuse of a key for another proposal. Prevent duplicate writes under concurrent calls.
 - Do not create credit notes, approved-platform refusals, payment status, or e-reporting in this first integration. Every future action needs its own business analysis, schemas, and permissions.
 
@@ -55,7 +57,7 @@ For a business error or denied access, return `isError: true`, a translated huma
 ```sh
 git clone https://github.com/incwo/fe-mcp-profile.git
 cd fe-mcp-profile
-git checkout v0.2.0
+git checkout v0.3.0
 npm ci
 node bin/check.js --case-id SYNTHETIC_CASE_ID -- mcp-server-start-command arguments
 node bin/check.js --http https://mcp.example.com/mcp --case-id SYNTHETIC_CASE_ID --header-env FE_MCP_AUTH_HEADER

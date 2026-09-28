@@ -68,7 +68,31 @@ test("three systems expose the same six MCP tools and complementary evidence", a
     assert.equal(evidence.digest.alg, "sha256");
     assert.equal(results[0].profile_version, PROFILE_VERSION);
     assert.equal(results[0].invoice.issue_date, "2026-09-23T08:00:00Z");
-    assert.equal(results[0].invoice.seller_id, "123456789");
+    assert.deepEqual(results[0].invoice.seller_id, {
+      scheme: "siren",
+      value: "123456789",
+    });
+    assert.deepEqual(results[0].invoice.buyer_id, {
+      scheme: "siren",
+      value: "987654321",
+    });
+    assert.equal(results[0].transaction_type, "b2b_domestic");
+    assert.equal(results[0].recipient_directory_status, "found");
+    assert.equal(results[0].recipient_pdp, "PA-DEMO-DEST");
+    assert.equal(results[0].routing_id, "ROUTE-DEMO-0042");
+    assert.equal(results[1].recipient_directory_status, null);
+    assert.deepEqual(
+      results.map((result) => result.system_role),
+      ["pa", "erp", "accounting"],
+    );
+    assert.equal(
+      results[0].events[1].reason_code,
+      "buyer:missing_order_reference",
+    );
+    assert.equal(
+      results[0].facts.find((fact) => fact.code === "refusal_reason").value,
+      results[0].events[1].reason_code,
+    );
   } finally {
     await Promise.all(connections.map((connection) => connection.close()));
   }
@@ -271,8 +295,44 @@ test("expired proposals return a stable error code without writing", () => {
 test("UTC timestamps and versioned rules are enforced by the profile", () => {
   const store = new ReferenceStore({ system: "pa" });
   const invoiceCase = store.get(CASE_ID);
+  for (const schema of Object.values(TOOL_SCHEMAS)) {
+    assert.ok(schema.output.profile_version.safeParse(PROFILE_VERSION).success);
+    assert.ok(!schema.output.profile_version.safeParse("0.2.0").success);
+  }
   z.object(TOOL_SCHEMAS.fe_get_invoice_case.output).parse(invoiceCase);
   z.object(TOOL_SCHEMAS.fe_check_invoice.output).parse(store.check(CASE_ID));
+  for (const [name, schema] of Object.entries(TOOL_SCHEMAS)) {
+    const sample =
+      name === "fe_find_invoices"
+        ? store.find()
+        : name === "fe_get_invoice_case"
+          ? invoiceCase
+          : name === "fe_check_invoice"
+            ? store.check(CASE_ID)
+            : name === "fe_get_available_actions"
+              ? store.available(CASE_ID)
+              : null;
+    if (sample) {
+      assert.ok(z.object(schema.output).safeParse(sample).success);
+      assert.ok(
+        !z
+          .object(schema.output)
+          .safeParse({ ...sample, profile_version: "0.2.0" }).success,
+      );
+    }
+  }
+  assert.ok(
+    !z.object(TOOL_SCHEMAS.fe_get_invoice_case.output).safeParse({
+      ...invoiceCase,
+      invoice: { ...invoiceCase.invoice, seller_id: "123456789" },
+    }).success,
+  );
+  assert.ok(
+    z.object(TOOL_SCHEMAS.fe_find_invoices.output).safeParse({
+      ...store.find(),
+      cases: [{ ...store.find().cases[0], current_state_std: "vendor:custom" }],
+    }).success,
+  );
   assert.ok(
     !z.object(TOOL_SCHEMAS.fe_get_invoice_case.output).safeParse({
       ...invoiceCase,
@@ -291,6 +351,14 @@ test("UTC timestamps and versioned rules are enforced by the profile", () => {
     new ProfileError("not_found", "fr").code,
     new ProfileError("not_found", "es").code,
   );
+});
+
+test("reason labels are localized while reason codes stay stable", () => {
+  const events = ["fr", "en", "es"].map(
+    (lang) => new ReferenceStore({ system: "pa", lang }).get(CASE_ID).events[1],
+  );
+  assert.equal(new Set(events.map((event) => event.reason_code)).size, 1);
+  assert.equal(new Set(events.map((event) => event.reason_label)).size, 3);
 });
 
 test("MCP error codes remain stable across translated messages", async () => {
