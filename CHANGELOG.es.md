@@ -4,6 +4,12 @@
 
 Las etiquetas Git versionan el repositorio; `profile_version` versiona el contrato FE-MCP transmitido. Estos números pueden diferir.
 
+## v0.3.0 — perfil 0.3.0 — 28 de septiembre de 2026
+
+- **Incompatible con 0.2.0**: `seller_id`/`buyer_id` pasan a `{ scheme, value } | null`. Convierta cadenas solo tras identificar con fiabilidad su esquema; en caso contrario use `null`.
+- `z.literal` fija `profile_version` en las seis salidas. Se añaden `system_role`, `current_state_std`, `transaction_type`, motivos de eventos y observaciones de enrutamiento.
+- Vocabulario de estados recomendado, alcance del e-reporting y correspondencia indicativa EN 16931 documentados en FR/EN/ES. Issues #12–#19.
+
 ## v0.2.0 — perfil 0.2.0 — 27 de septiembre de 2026
 
 - **Incompatible con el perfil 0.1.0**: `digest_sha256` pasa a `digest: { alg, value } | null` y `state_domain` es obligatorio en la búsqueda.

@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 
-export const PROFILE_VERSION = "0.2.0";
+export const PROFILE_VERSION = "0.3.0";
 export const CASE_ID = "FR-2026-0042";
 export const TOOL_NAMES = [
   "fe_find_invoices",
@@ -15,6 +15,20 @@ const text = z.string().min(1);
 const caseId = text.describe("Stable case identifier from fe_find_invoices");
 const utcDateTime = z.iso.datetime({ offset: false });
 const ruleRef = z.string().regex(/^[^:@\s]+:[^@\s]+@[^@\s]+$/);
+const profileVersion = z.literal(PROFILE_VERSION);
+const systemRole = z
+  .enum(["pa", "erp", "accounting", "other"])
+  .nullable()
+  .optional();
+const partyId = z
+  .object({
+    scheme: z.enum(["siren", "siret", "vat", "duns", "gln", "other"]),
+    value: text,
+  })
+  .nullable();
+const transactionType = z
+  .enum(["b2b_domestic", "b2c", "b2b_international", "payment_data", "other"])
+  .nullable();
 
 export const TOOL_SCHEMAS = {
   fe_find_invoices: {
@@ -24,14 +38,16 @@ export const TOOL_SCHEMAS = {
       cursor: z.string().optional(),
     },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       cases: z.array(
         z.object({
           case_id: text,
           invoice_number: text,
           state_domain: z.enum(["pa", "commercial", "accounting"]),
           current_state: text,
+          current_state_std: text.nullable().optional(),
         }),
       ),
       next_cursor: z.string().nullable(),
@@ -40,9 +56,17 @@ export const TOOL_SCHEMAS = {
   fe_get_invoice_case: {
     input: { case_id: caseId },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       case_id: caseId,
+      transaction_type: transactionType,
+      recipient_directory_status: z
+        .enum(["found", "not_found", "ambiguous"])
+        .nullable()
+        .optional(),
+      recipient_pdp: text.nullable().optional(),
+      routing_id: text.nullable().optional(),
       invoice: z.object({
         number: text,
         seller: text,
@@ -51,8 +75,8 @@ export const TOOL_SCHEMAS = {
         currency: text,
         issue_date: utcDateTime,
         due_date: utcDateTime.nullable(),
-        seller_id: text.nullable(),
-        buyer_id: text.nullable(),
+        seller_id: partyId,
+        buyer_id: partyId,
       }),
       facts: z.array(
         z.object({
@@ -68,6 +92,8 @@ export const TOOL_SCHEMAS = {
           at: utcDateTime,
           source: text,
           evidence_ref: text,
+          reason_code: text.nullable(),
+          reason_label: text.nullable(),
         }),
       ),
       evidence: z.array(
@@ -83,8 +109,9 @@ export const TOOL_SCHEMAS = {
   fe_check_invoice: {
     input: { case_id: caseId },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       case_id: caseId,
       findings: z.array(
         z.object({
@@ -100,8 +127,9 @@ export const TOOL_SCHEMAS = {
   fe_get_available_actions: {
     input: { case_id: caseId },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       case_id: caseId,
       actions: z.array(
         z.object({ type: text, requires_approval: z.boolean(), effect: text }),
@@ -111,8 +139,9 @@ export const TOOL_SCHEMAS = {
   fe_prepare_action: {
     input: { case_id: caseId, type: text, note: z.string().min(1).max(1000) },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       case_id: caseId,
       proposal_id: text,
       type: text,
@@ -131,8 +160,9 @@ export const TOOL_SCHEMAS = {
       idempotency_key: text,
     },
     output: {
-      profile_version: text,
+      profile_version: profileVersion,
       system: text,
+      system_role: systemRole,
       proposal_id: text,
       receipt_id: text,
       case_id: caseId,

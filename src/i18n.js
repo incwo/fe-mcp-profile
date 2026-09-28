@@ -39,6 +39,7 @@ const messages = {
     missing_po: "La référence de commande manque dans la facture transmise.",
     buyer_refusal:
       "Le destinataire a refusé la facture ; vérifier le motif avant toute correction.",
+    buyer_refusal_reason: "Référence de commande absente de la facture.",
     po_available:
       "Une commande liée contient une référence qui pourrait aider à résoudre le refus.",
     no_booking:
@@ -92,6 +93,7 @@ const messages = {
       "The purchase order reference is missing from the transmitted invoice.",
     buyer_refusal:
       "The buyer refused the invoice; check the reason before any correction.",
+    buyer_refusal_reason: "Purchase order reference missing from the invoice.",
     po_available:
       "A linked order contains a reference that may help resolve the refusal.",
     no_booking: "No accounting entry is linked to this case in the example.",
@@ -144,6 +146,7 @@ const messages = {
     missing_po: "Falta la referencia del pedido en la factura transmitida.",
     buyer_refusal:
       "El destinatario rechazó la factura; compruebe el motivo antes de corregirla.",
+    buyer_refusal_reason: "Falta la referencia del pedido en la factura.",
     po_available:
       "Un pedido vinculado contiene una referencia que podría ayudar a resolver el rechazo.",
     no_booking:

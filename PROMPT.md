@@ -6,12 +6,12 @@ Copiez **tout le texte ci-dessous** dans l’IA codante qui travaille sur le dé
 
 ---
 
-Tu travailles dans le dépôt du MCP d’un éditeur de logiciel. **Implémente le profil communautaire FE-MCP 0.2.0** sur ce serveur, avec des données et des autorisations réelles du logiciel, puis démontre la conformité sur un dossier de test synthétique. Fais le travail dans le dépôt, exécute les tests et rends un compte rendu vérifiable. N’active aucune transmission de facture ni écriture réglementaire pour satisfaire ce prompt.
+Tu travailles dans le dépôt du MCP d’un éditeur de logiciel. **Implémente le profil communautaire FE-MCP 0.3.0** sur ce serveur, avec des données et des autorisations réelles du logiciel, puis démontre la conformité sur un dossier de test synthétique. Fais le travail dans le dépôt, exécute les tests et rends un compte rendu vérifiable. N’active aucune transmission de facture ni écriture réglementaire pour satisfaire ce prompt.
 
 ## Contrat à lire avant de coder
 
-- Dépôt public de référence : `https://github.com/incwo/fe-mcp-profile/tree/v0.2.0`.
-- Lis `SPEC.md`, `src/profile.js`, `src/reference.js`, `bin/check.js` et les tests du dépôt de référence. Le code de `src/profile.js` est la source exacte des noms, paramètres et schémas de la version 0.2.0. Ne remplace pas les schémas par des variantes « équivalentes » sans le signaler.
+- Dépôt public de référence : `https://github.com/incwo/fe-mcp-profile/tree/v0.3.0`.
+- Lis `SPEC.md`, `src/profile.js`, `src/reference.js`, `bin/check.js` et les tests du dépôt de référence. Le code de `src/profile.js` est la source exacte des noms, paramètres et schémas de la version 0.3.0. Ne remplace pas les schémas par des variantes « équivalentes » sans le signaler.
 - Le profil est une proposition communautaire au-dessus de MCP et des API métier. Il ne remplace ni les plateformes agréées, ni XP Z12-013, ni les règles fiscales applicables.
 - Utilise le SDK MCP, le transport, l’authentification et les conventions déjà présents dans ton dépôt. N’introduis pas un second serveur ou une nouvelle pile technique si le serveur actuel peut être étendu proprement.
 
@@ -33,7 +33,9 @@ Tu travailles dans le dépôt du MCP d’un éditeur de logiciel. **Implémente 
 | `fe_prepare_action`        | Prépare une action typée, son effet annoncé, sa révision attendue et son expiration ; ne modifie ni facture émise ni statut réglementaire. Pour la première intégration, limite-toi à `record_internal_note` si le logiciel possède réellement une note interne. |
 | `fe_execute_action`        | Revérifie droits, tenant, approbation, expiration et révision au moment de l’exécution ; applique une seule fois l’effet et rend un reçu stable. Si l’approbation sûre ou l’écriture correspondante n’existe pas, refuse l’exécution explicitement.              |
 
-Pour chaque succès, renvoie `structuredContent` conforme à l’`outputSchema` publié, avec `profile_version: "0.2.0"` et un `system` stable. `fe_find_invoices` doit fournir `state_domain` (`pa`, `commercial` ou `accounting`) et un curseur opaque : même requête et même limite rendent la même page tant que le curseur est valide ; un curseur invalide rend `invalid_input`. `fe_get_invoice_case` inclut `issue_date`, `due_date`, `seller_id` et `buyer_id` selon le schéma. Toutes les dates/heures sont en UTC avec `Z`. `rule_ref` suit `namespace:rule@version`. Préserve les identifiants source et la provenance ; `case_id` est local au serveur. N’utilise `digest: { alg: "sha256", value: "..." }` que si les octets exacts de la pièce sont accessibles au même acteur par une voie autorisée ; sinon mets `null`.
+Pour chaque succès, renvoie `structuredContent` conforme à l’`outputSchema` publié, avec `profile_version: "0.3.0"` et un `system` stable. `fe_find_invoices` doit fournir `state_domain` (`pa`, `commercial` ou `accounting`) et un curseur opaque : même requête et même limite rendent la même page tant que le curseur est valide ; un curseur invalide rend `invalid_input`. `fe_get_invoice_case` inclut `issue_date`, `due_date`, `seller_id` et `buyer_id` selon le schéma. Toutes les dates/heures sont en UTC avec `Z`. `rule_ref` suit `namespace:rule@version`. Préserve les identifiants source et la provenance ; `case_id` est local au serveur. N’utilise `digest: { alg: "sha256", value: "..." }` que si les octets exacts de la pièce sont accessibles au même acteur par une voie autorisée ; sinon mets `null`.
+
+Pour le profil 0.3.0, traite `seller_id`/`buyer_id` comme `{ scheme, value } | null` et ne devine jamais un schéma. Renseigne `system_role` seulement si le rôle du serveur est connu ; garde `system` stable. Garde `current_state` natif et n’ajoute `current_state_std` que si la correspondance recommandée de `SPEC.md` est justifiée. Le dossier porte `transaction_type` nullable, ainsi que `recipient_directory_status`, `recipient_pdp` et `routing_id` nullable en lecture seule ; ne simule pas une résolution d’annuaire. Chaque événement inclut `reason_code` et `reason_label` nullable, sans confondre rejet PA et refus acheteur. Le profil ne définit pas l’envoi de e-reporting. Vérifie `profile_version` exactement à `0.3.0` sur les six sorties.
 
 Pour une erreur métier ou un accès refusé, retourne `isError: true`, un message humain traduit dans `content` et un code stable dans `_meta["fe-mcp/error"].code`. Utilise les codes définis dans `SPEC.md` ; ne place pas l’erreur dans le `structuredContent` réservé aux succès.
 
@@ -41,7 +43,7 @@ Pour une erreur métier ou un accès refusé, retourne `isError: true`, un messa
 
 - Vérifie identité, entreprise/tenant, rôle et délégation **côté serveur à chaque appel**, y compris lectures, listes, preuves et propositions. Le texte d’un prompt, les arguments fournis par un agent et les annotations MCP ne donnent aucun droit. Préviens les fuites entre tenants, dans les erreurs, recherches et curseurs aussi.
 - Réutilise l’authentification existante. Ne transmet pas un jeton d’un client MCP directement à une PA ou à une autre API sans le flux d’autorisation prévu par cette API. Ne journalise ni secrets, ni originaux, ni pièces sensibles.
-- Le champ `approval_code` du profil 0.2.0 **n’est pas** une preuve d’approbation à lui seul. En production, accepte uniquement une autorisation vérifiable côté serveur, liée à l’acteur, au tenant, au `proposal_id`, à l’effet et à une durée courte. Si ton architecture ne le permet pas encore, expose l’outil mais rends l’exécution indisponible ; ne copie pas le code statique du serveur de démonstration.
+- Le champ `approval_code` du profil 0.3.0 **n’est pas** une preuve d’approbation à lui seul. En production, accepte uniquement une autorisation vérifiable côté serveur, liée à l’acteur, au tenant, au `proposal_id`, à l’effet et à une durée courte. Si ton architecture ne le permet pas encore, expose l’outil mais rends l’exécution indisponible ; ne copie pas le code statique du serveur de démonstration.
 - Lie l’`idempotency_key` à l’acteur, au tenant et à l’opération ; persiste les reçus si le serveur redémarre ou tourne sur plusieurs instances. Refuse une même clé pour une autre proposition. Empêche la double écriture malgré appels concurrents.
 - Ne crée ni avoir, ni refus PA, ni statut d’encaissement, ni e-reporting par ce premier branchement. Toute action future exigera une analyse métier, des schémas et des droits spécifiques.
 
@@ -55,7 +57,7 @@ Pour une erreur métier ou un accès refusé, retourne `isError: true`, un messa
 ```sh
 git clone https://github.com/incwo/fe-mcp-profile.git
 cd fe-mcp-profile
-git checkout v0.2.0
+git checkout v0.3.0
 npm ci
 node bin/check.js --case-id ID_DU_DOSSIER_SYNTHETIQUE -- commande-de-demarrage-du-serveur-mcp arguments
 node bin/check.js --http https://mcp.exemple.fr/mcp --case-id ID_DU_DOSSIER_SYNTHETIQUE --header-env FE_MCP_AUTH_HEADER

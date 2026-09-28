@@ -4,7 +4,7 @@
 
 [Français](README.md) · English · [Español](README.es.md)
 
-> Exploratory profile 0.2.0. This project is neither an AFNOR standard, nor an approved platform, nor a tax compliance certification. It connects to no real service. Profile and repository versions are [tracked separately](CHANGELOG.en.md).
+> Exploratory profile 0.3.0. This project is neither an AFNOR standard, nor an approved platform, nor a tax compliance certification. It connects to no real service. Profile and repository versions are [tracked separately](CHANGELOG.en.md).
 
 **Vendors:** give the [complete implementation prompt](PROMPT.en.md) to your coding AI to add the profile to your MCP server. [FR](PROMPT.md) and [ES](PROMPT.es.md) versions are available.
 

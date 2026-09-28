@@ -18,8 +18,8 @@ const invoice = Object.freeze({
   currency: "EUR",
   issue_date: "2026-09-23T08:00:00Z",
   due_date: "2026-10-23T00:00:00Z",
-  seller_id: "123456789",
-  buyer_id: "987654321",
+  seller_id: { scheme: "siren", value: "123456789" },
+  buyer_id: { scheme: "siren", value: "987654321" },
 });
 const invoices = new Map([
   [CASE_ID, invoice],
@@ -54,18 +54,31 @@ const invoiceDigest = createHash("sha256")
   .update(INVOICE_RESOURCE_TEXT)
   .digest("hex");
 
-const base = (system) => ({ profile_version: PROFILE_VERSION, system });
+const base = (system) => ({
+  profile_version: PROFILE_VERSION,
+  system,
+  system_role: system,
+});
 const fact = (code, value, source) => ({
   code,
   value,
   source,
   observed_at: observedAt,
 });
-const event = (code, at, source, evidence_ref) => ({
+const event = (
   code,
   at,
   source,
   evidence_ref,
+  reason_code = null,
+  reason_label = null,
+) => ({
+  code,
+  at,
+  source,
+  evidence_ref,
+  reason_code,
+  reason_label,
 });
 
 export class ReferenceStore {
@@ -175,6 +188,14 @@ export class ReferenceStore {
             : this.system === "erp"
               ? "issued"
               : "not_booked",
+        current_state_std:
+          this.system === "pa"
+            ? id === CASE_ID
+              ? "refusee"
+              : "deposee"
+            : this.system === "erp"
+              ? "issued"
+              : "not_booked",
       })),
       next_cursor:
         offset + limit < matches.length
@@ -194,6 +215,11 @@ export class ReferenceStore {
     const common = {
       ...base(this.system),
       case_id,
+      transaction_type: "b2b_domestic",
+      recipient_directory_status: this.system === "pa" ? "found" : null,
+      recipient_pdp: this.system === "pa" ? "PA-DEMO-DEST" : null,
+      routing_id:
+        this.system === "pa" ? `ROUTE-DEMO-${case_id.slice(-4)}` : null,
       invoice: caseInvoice,
       revision: this.revisions.get(case_id),
     };
@@ -229,10 +255,22 @@ export class ReferenceStore {
         facts: [
           fact("purchase_order_ref", "", INVOICE_RESOURCE_URI),
           fact("lifecycle_status", "refused_by_buyer", "pa:status:CDAR-42"),
+          fact(
+            "refusal_reason",
+            "buyer:missing_order_reference",
+            "pa:status:CDAR-42",
+          ),
         ],
         events: [
           event("deposited", "2026-09-23T09:00:00Z", "pa", "pa:status:CDAR-40"),
-          event("refused_by_buyer", observedAt, "pa", "pa:status:CDAR-42"),
+          event(
+            "refused_by_buyer",
+            observedAt,
+            "pa",
+            "pa:status:CDAR-42",
+            "buyer:missing_order_reference",
+            t(this.lang, "buyer_refusal_reason"),
+          ),
         ],
         evidence: [
           {
